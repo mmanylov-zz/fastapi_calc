@@ -16,25 +16,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class Numbers(BaseModel):
-    x: int
-    y: int
 
-    @validator('x')
+class Numbers(BaseModel):
+    number1: int
+    number2: int
+
+    @validator('number1')
     def positive_integer(cls, v):
         if v <= 0:
             raise ValueError('value must be a positive integer')
         return v
 
-    @validator('y')
+    @validator('number2')
     def non_negative_integer(cls, v):
         if v < 0:
             raise ValueError('value must be a non-negative integer')
         return v
 
 
-@app.post('/', status_code=200)
+class Response(BaseModel):
+    result: int
+
+
+@app.post('/', status_code=200, response_model=Response)
 async def add_movie(payload: Numbers):
     numbers = payload.dict()
-    result = numbers['x'] + numbers['y']
+    result = numbers['number1'] + numbers['number2']
     return {'result': result}
